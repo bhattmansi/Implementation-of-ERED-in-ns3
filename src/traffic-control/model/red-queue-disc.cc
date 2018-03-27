@@ -127,15 +127,30 @@ TypeId RedQueueDisc::GetTypeId (void)
                    BooleanValue (false),
                    MakeBooleanAccessor (&RedQueueDisc::m_isNonlinear),
                    MakeBooleanChecker ())
+    .AddAttribute ("ERED",
+                   "True to enable Effective RED",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&RedQueueDisc::m_isERED),
+                   MakeBooleanChecker ())
     .AddAttribute ("MinTh",
                    "Minimum average length threshold in packets/bytes",
                    DoubleValue (5),
                    MakeDoubleAccessor (&RedQueueDisc::m_minTh),
                    MakeDoubleChecker<double> ())
+     .AddAttribute ("MinThs",
+                   "Minimum average length threshold in packets/bytes",
+                   DoubleValue (0),
+                   MakeDoubleAccessor (&RedQueueDisc::m_minThs),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("MaxTh",
                    "Maximum average length threshold in packets/bytes",
                    DoubleValue (15),
                    MakeDoubleAccessor (&RedQueueDisc::m_maxTh),
+                   MakeDoubleChecker<double> ())
+     .AddAttribute ("MaxThs",
+                   "Maximum average length threshold in packets/bytes",
+                   DoubleValue (0),
+                   MakeDoubleAccessor (&RedQueueDisc::m_maxThs),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("QueueLimit",
                    "Queue limit in bytes/packets",
@@ -793,6 +808,30 @@ RedQueueDisc::CalculatePNew (void)
         {
           p *= p * 1.5;
         }
+        
+       if(m_isERED)
+        {
+               uint32_t q_len = GetInternalQueue (0)->GetCurrentSize ().GetValue ();
+               m_maxThs = 2  * m_maxTh;
+               m_minThs = (m_maxTh + m_minTh)/2 + m_minTh ;
+               
+                if (m_minThs < m_qAvg && m_qAvg < m_maxThs && q_len >= m_minThs)
+                       {
+                        
+                                p= 1.0;
+
+                        }
+                else if (m_qAvg < m_minThs && q_len > 1.75 * m_maxTh)
+                        {
+                                p = m_curMaxP ;
+                        }                
+                
+                else if (m_maxThs <= m_qAvg)
+                        {
+                                p=1.0;                        
+                        }
+
+        }
 
       p *= m_curMaxP;
     }
@@ -880,6 +919,14 @@ RedQueueDisc::DoDequeue (void)
       NS_LOG_LOGIC ("Number packets " << GetInternalQueue (0)->GetNPackets ());
       NS_LOG_LOGIC ("Number bytes " << GetInternalQueue (0)->GetNBytes ());
 
+      double K = (m_maxTh - m_minTh)/2 + m_minTh;
+      double T = (m_maxTh + m_minTh)/2 + m_maxTh;
+      double N = 2*(m_maxTh + m_minTh)/3 + m_minTh;
+      uint32_t q_len = GetInternalQueue (0)->GetCurrentSize ().GetValue ();
+      if (m_qAvg > K && q_len < T)
+      {
+                m_qAvg = N ;
+        } 
       return item;
     }
 }

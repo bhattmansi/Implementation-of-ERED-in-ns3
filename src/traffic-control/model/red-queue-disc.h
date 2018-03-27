@@ -305,7 +305,9 @@ private:
   bool m_isARED;            //!< True to enable Adaptive RED
   bool m_isAdaptMaxP;       //!< True to adapt m_curMaxP
   double m_minTh;           //!< Minimum threshold for m_qAvg (bytes or packets)
+  double m_minThs;          //!< Minimum threshold for m_qAvg (bytes or packets)
   double m_maxTh;           //!< Maximum threshold for m_qAvg (bytes or packets), should be >= 2 * m_minTh
+  double m_maxThs;          //!< Maximum threshold for m_qAvg (bytes or packets), should be >= 2 * m_minTh
   double m_qW;              //!< Queue weight given to cur queue size sample
   double m_lInterm;         //!< The max probability of dropping a packet
   Time m_targetDelay;       //!< Target average queuing delay in ARED
@@ -317,6 +319,7 @@ private:
   Time m_rtt;               //!< Rtt to be considered while automatically setting m_bottom in ARED
   bool m_isFengAdaptive;    //!< True to enable Feng's Adaptive RED
   bool m_isNonlinear;       //!< True to enable Nonlinear RED
+  bool m_isERED;            //!< True to enable Effective RED
   double m_b;               //!< Increment parameter for m_curMaxP in Feng's Adaptive RED
   double m_a;               //!< Decrement parameter for m_curMaxP in Feng's Adaptive RED
   bool m_isNs1Compat;       //!< Ns-1 compatibility
