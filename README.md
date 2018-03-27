@@ -1,8 +1,6 @@
 # Implementation-of-ERED-in-ns3
 
-## Course Code: CS822
-
-## Assignment: #GP1
+## Course Code: CS703
 
 ### Overview
 Effective RED (ERED) [1] aims to reduce packet loss rates in a simple and scalable manner by making several refinements and by controlling packet dropping function both with average queue size and instantaneous queue size. The original paper of ERED used ns-2 [2] for comparing its performance against RED [3]. However, till date the implementation of ERED is not publicly available in any network simulator. This repository provides an implementation of ERED algorithm in ns-3 [4].
